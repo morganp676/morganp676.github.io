@@ -1,0 +1,67 @@
+---
+title: "Assignment 6"
+format:
+  html:
+    output-file: "index.html"
+editor: visual
+---
+```{r}
+#| echo: false
+#| warning: false
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(reactable)
+library(plotly)
+library(crosstalk)
+df <- read.csv("https://manctsui.github.io/datasets/timesData.csv")
+reactable(df, defaultPageSize = 4, searchable = TRUE)
+```
+# Problem 1A
+```{r}
+top_3 <- df |>
+  group_by(country) |>
+  summarise(appearances = n()) |>
+  arrange(desc(appearances)) |>
+  head(3) |>
+  rename("Country Name" = country, "Number of Times Featured" = appearances)
+reactable(top_3, striped = TRUE, highlight = TRUE, bordered = TRUE)
+```
+# Problem 1B
+```{r}
+ggplot(top_3, aes(x = `Country Name`, y = `Number of Times Featured`)) +
+  geom_col(fill = "darkgreen") +
+  labs(title = "Top 3 Countries with the Most University Rankings Appearances", x = "Country", y = "Number of Times Featured")
+```
+# Problem 2A
+```{r}
+top_50_2011 <- df |> 
+  select(world_rank, year) |>
+  filter(year == 2011) |> 
+  head(50)
+
+reactable(top_50_2011, striped = TRUE, highlight = TRUE, bordered = TRUE)
+```
+# Problem 2B
+This would not work, because each row should have a unique value. However, there are several duplicate rankings.
+
+# Problem 2C
+```{r}
+top_50_2011$world_rank <- as.numeric(top_50_2011$world_rank)
+sd <- SharedData$new(top_50_2011)
+rank <- filter_slider(id = "uni_rank", label = "Narrow Selection Based on Rank", sharedData = sd, column = ~world_rank)
+table <- reactable(sd, striped = TRUE, highlight = TRUE, bordered = TRUE)
+bscols(rank, table, widths = c(12, 12))
+```
+# Problem 3
+```{r}
+df_2016 <- df |> 
+  filter(year == 2016) |>
+  drop_na(num_students, student_staff_ratio, teaching)
+sd <- SharedData$new(df_2016, key = ~university_name)
+p1 <- sd |> 
+  plot_ly(x = ~num_students, y = ~student_staff_ratio, text = ~university_name, type = 'scatter', mode = 'markers')
+p2 <- sd |> 
+  plot_ly(x = ~student_staff_ratio, y = ~teaching, text = ~university_name, type = 'scatter', mode = 'markers')
+bscols(widths = c(6, 6), p1, p2)
+```
