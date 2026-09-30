@@ -1,0 +1,87 @@
+---
+title: "Assignment 7"
+format:
+  html:
+    output-file: "index.html"
+editor: visual
+---
+
+```{r}
+library(reactable)
+library(tidyr)
+df <- data.frame(
+x = c(5, 1, 4, NA, NA, NA, 2, 1),
+y = c(5, NA, 3, 2, 5, NA, 2, 1),
+z = c(1, 4, 2, 5, 2, NA, 5, 4),
+t = c(4, 2, NA, 1, 5, 2, 3, 3)
+)
+```
+
+# Problem 1
+
+```{r}
+cor(df$y, df$x, use = "pairwise.complete.obs")
+cor(df$y, df$z, use = "pairwise.complete.obs")
+cor(df$y, df$t, use = "pairwise.complete.obs")
+mean_y <- mean(df$y, na.rm = TRUE)
+mean_t <- mean(df$t, na.rm = TRUE)
+mean_y
+mean_t
+```
+
+Like-minded users are user 1 (0.96) and user 4 (0.72). Out of these two, only user 4 watched movie 6. Thus, y~6~ - 3 = 2 - 2.85 =\> y~6~ = 2.15
+
+# Problem 2
+
+```{r}
+matrix <- cor(df, use = "pairwise.complete.obs", method = "pearson")
+cor(df, use = "pairwise.complete.obs")
+```
+
+Movie y is most similar movie x because it is the closest correlation coefficient to 1 (x).
+
+# Problem 3A
+
+```{r}
+df <- read.csv("http://manctsui.github.io/datasets/countries.csv")
+library(dplyr)
+countries_imputed <- df |>
+  group_by(Region) |>
+  mutate(
+    Agriculture = ifelse(is.na(Agriculture), mean(Agriculture, na.rm = TRUE), Agriculture),
+    Industry = ifelse(is.na(Industry), mean(Industry, na.rm = TRUE), Industry)
+  ) |>
+  ungroup()
+head(countries_imputed)
+df |> 
+  group_by(Region) |> 
+  summarise(
+    Agriculture_NAs = sum(is.na(Agriculture)),
+    Industry_NAs = sum(is.na(Industry))
+  )
+```
+
+# Problem 3B
+
+I had to fill 12 agricultural NAs and 12 industry NAs
+
+# Problem 4
+
+```{r}
+df <- data.frame(temp = c(79, 74, 73, 76, 82, 72, 71, 79, 83, 70, 73, 75, 77), chirps = c(44, 40, 38, 43, 48, 37, 34, 45, 51, 32, 35, 42, 43))
+mean(df$temp)
+sd(df$temp)
+mean(df$chirps)
+sd(df$chirps)
+cor(df$temp, df$chirps)
+```
+
+Slope: m = r(s~y~/s~x~)
+
+Intercept: b = $\bar{y}$ - m$\bar{x}$
+
+m = 0.97(4.11/5.58) = 0.714
+
+b = 75.69 - 0.714(40.92) = 46.47
+
+Thus, temp = 0.714(chirps) + 46.47.
