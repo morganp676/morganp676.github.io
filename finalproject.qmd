@@ -1,0 +1,49 @@
+---
+title: "The Effects of BMI and Job Stress on Sleep"
+format:
+  html:
+    output-file: "index.html"
+editor: visual
+---
+For thousands of people sleeping is a struggle, whether they have a sleeping disorder or simply do not get enough quality sleep. To find out what causes sleep problems, I analyzed the Sleep Health and Lifestyle Dataset. In doing this, I discovered a connection between:
+
+-BMI and sleep disorders
+
+-Occupation and stress levels
+
+-Stress levels and sleep duration and quality
+
+First, let's look at how BMI affects sleep.
+```{r}
+#| echo: false
+#| warning: false
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(reactable)
+library(plotly)
+library(crosstalk)
+df <- read.csv("Sleep_health_and_lifestyle_dataset.csv")
+
+ggplot(df, aes(x = BMI.Category, fill = Sleep.Disorder)) +
+  geom_bar(position = "dodge") +
+  labs(title = "Sleep Disorders by BMI Category", x = "BMI Category", y = "Number of People")
+```
+As you can see, the majority of people with a normal BMI do not have a sleep disorder. However, overweight and obese people are significantly more likely to have a sleep disorder than not. Thus, it is clear that a high BMI increases the likelihood of sleep disorders. However, this does not explain why many people who are a normal weight have sleep issues, meaning that physical health is not the only factor at play. In order to find out what else may cause problems with sleep, we will look at occupation.
+```{r}
+#| echo: false
+ggplot(df, aes(x = Stress.Level, y = Occupation)) +
+  stat_summary(fun = "mean", geom = "col", fill = "darkblue") +
+  labs(title = "Average Stress Level by Occupation", x = "Avg Stress Level (1–10)")
+```
+We can see that jobs such as sales representative, salesperson, and scientist lead to high stress levels. However, this is only half the story.
+```{r}
+#| echo: false
+ggplot(df, aes(x = factor(Stress.Level))) +
+  stat_summary(aes(y = Sleep.Duration, fill = "Sleep Duration (Hrs)"), fun = "mean", geom = "col", alpha = 0.6) +
+  stat_summary(aes(y = Quality.of.Sleep, color = "Sleep Quality"), fun = "mean", geom = "line", group = 1, linewidth = 1.5) +
+  labs(title = "Effect of Stress on Sleep Duration & Quality", x = "Stress Level", y = "Average", fill = NULL, color = NULL)
+```
+As you can see from the chart above, both the quality and duration of sleep go down as stress levels grow higher. People with stress levels around 3-4 get 7 to 8 hours of sleep, while those with stress levels around 7-8 get approximately 6 hours of sleep.
+
+Evidently, poor sleep is caused by both physical health issues and stress. People with high BMIs and high-stress jobs are much more likely to experience some sort of sleep issue. This means that in order to sleep well, it is important to both prioritize physical health and manage work stress in healthy ways.
